@@ -20,7 +20,8 @@ def __main__():
     
     if chrome_service is None:
         ml_url = os.getenv("MERCADOLIBRE_URL")
-        chrome_service = ChromeService(ml_url)
+        arg_url = os.getenv("ARGENPROP_URL")
+        chrome_service = ChromeService(ml_url, arg_url)
     
     if mail_service is None:
         smtp_server = os.getenv("SMTP_SERVER")
@@ -32,12 +33,21 @@ def __main__():
     new_deptos = []
     
     departamentos = firestore_service.get_departamentos()
+
     chrome_service.start_browser()
     ml_departamentos = chrome_service.get_ml_departamentos()
+
+    chrome_service.start_browser()
+    arg_departamentos = chrome_service.get_arg_departamentos()
 
     codigos_existentes = {d.codigo for d in departamentos}
 
     for d in ml_departamentos:
+        if d.codigo not in codigos_existentes:
+            firestore_service.add_departamento(d)
+            new_deptos.append(d)
+
+    for d in arg_departamentos:
         if d.codigo not in codigos_existentes:
             firestore_service.add_departamento(d)
             new_deptos.append(d)

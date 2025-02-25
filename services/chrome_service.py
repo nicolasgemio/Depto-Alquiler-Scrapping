@@ -8,8 +8,9 @@ from firebase_admin import firestore
 from models.departamento import Departamento
 
 class ChromeService():
-    def __init__(self, ml_url):
-        self.ML_URL = ml_url
+    def __init__(self, ml_url, arg_url):
+        self.MERCADOLIBRE_URL = ml_url
+        self.ARGENPROP_URL = arg_url
 
     def start_browser(self):
         options = webdriver.ChromeOptions()
@@ -25,7 +26,7 @@ class ChromeService():
         try:
             departamentos = []
             # Abre la página de Mercado Libre
-            self.driver.get(self.ML_URL)
+            self.driver.get(self.MERCADOLIBRE_URL)
 
             # Espera algunos segundos para que la página cargue (opcional)
             self.driver.implicitly_wait(10)
@@ -61,4 +62,41 @@ class ChromeService():
             self.driver.quit()
             return departamentos
 
-        
+    def get_arg_departamentos(self):
+        try:
+            departamentos = []
+            
+            # Abre la página de Argenprop
+            self.driver.get(self.ARGENPROP_URL)
+
+            # Espera algunos segundos para que la página cargue (opcional)
+            self.driver.implicitly_wait(10)
+
+            # Realiza las acciones que necesites aquí (por ejemplo, buscar algo, navegar, etc.)
+            elementos = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.listing__items > div.listing__item"))
+            )
+
+            for div in elementos:
+                try:
+                    titulo = div.find_element(By.CLASS_NAME, "card__title").text  # Ajusta la clase real
+                    precio = div.find_element(By.CLASS_NAME, "card__price").text  # Ajusta la clase real
+                    direccion = div.find_element(By.CLASS_NAME, "card__address").text  # Ajusta la clase real
+
+                    enlace = div.find_element(By.CLASS_NAME, "card").get_attribute("href")
+
+                    id = div.get_attribute("id")
+                    codigo = f"ARG-{id}"
+                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False)
+
+                    departamentos.append(depto)
+
+                except Exception as e:
+                    print(f"Error procesando un elemento: {e}")
+
+        except Exception as e:
+            print(f"Error procesando un elemento: {e}")
+        finally:
+            self.driver.close()
+            self.driver.quit()
+            return departamentos
