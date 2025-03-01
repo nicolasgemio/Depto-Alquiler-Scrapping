@@ -37,7 +37,9 @@ class FireStoreService():
                 depto_data.get('rejected_a'),
                 depto_data.get('creacion'),
                 depto_data.get('favorito_n'),
-                depto_data.get('favorito_a')
+                depto_data.get('favorito_a'),
+                depto_data.get('comentario_n'),
+                depto_data.get('comentario_a')
                 )
             lista_departamentos.append(departamento)
 
@@ -58,7 +60,9 @@ class FireStoreService():
             "rejected_a": departamento.rejected_a,
             "creacion": departamento.creacion,
             "favorito_n": departamento.favorito_n,
-            "favorito_a": departamento.favorito_a
+            "favorito_a": departamento.favorito_a,
+            "comentario_n": departamento.comentario_n,
+            "comentario_a": departamento.comentario_a
         }
 
         # Agregar el documento a la colección "deptos"

@@ -49,7 +49,7 @@ class ChromeService():
                     pattern = r"MLA-\d+"  # Busca "MLA-" seguido de uno o más dígitos
                     codigo = re.search(pattern, enlace).group()
 
-                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False)
+                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False, '', '')
 
                     departamentos.append(depto)
 
@@ -87,7 +87,7 @@ class ChromeService():
 
                     id = div.get_attribute("id")
                     codigo = f"ARG-{id}"
-                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False)
+                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False, '', '')
 
                     departamentos.append(depto)
 
