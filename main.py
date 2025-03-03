@@ -44,17 +44,17 @@ def __main__():
 
     for d in ml_departamentos:
         if d.codigo not in codigos_existentes:
-            firestore_service.add_departamento(d)
-            new_deptos.append(d)
+            new_d = firestore_service.add_departamento(d)
+            new_deptos.append(new_d)
 
     for d in arg_departamentos:
         if d.codigo not in codigos_existentes:
-            firestore_service.add_departamento(d)
-            new_deptos.append(d)
+            new_d = firestore_service.add_departamento(d)
+            new_deptos.append(new_d)
 
     mensaje = ""
     for d in new_deptos:
-        mensaje += f"<p><strong>{d.codigo} - {d.titulo}</strong><br><a href='{d.link}'>Ver</a></p><hr>"
+        mensaje += f"<p><strong>{d.codigo} - {d.titulo}</strong><br><a href='https://scarpdepto.vercel.app/departments/{ d.id }'>Ver</a></p><hr>"
 
     if mensaje != "":
         mail_service.send_email(mensaje)
@@ -64,4 +64,4 @@ def __main__():
 if __name__ == "__main__":
     while True:
         __main__()
-        time.sleep(1800)
+        time.sleep(900)

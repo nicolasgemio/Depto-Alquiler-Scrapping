@@ -70,4 +70,6 @@ class FireStoreService():
 
         print(f"Departamento agregado con ID: {nuevo_doc_ref[1].id}")
 
+        return nuevo_doc_ref
+
 
