@@ -6,6 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from models.departamento import DepartmentDto
+from selenium.webdriver.chrome.options import Options
+from pathlib import Path
 from datetime import datetime, timezone
 from selenium.webdriver.chrome.service import Service
 from typing import List
@@ -19,11 +21,20 @@ class ChromeService():
         options = webdriver.ChromeOptions()
         carpeta_inicio_usuario = os.path.expanduser("~")
         if platform.system() == "Windows":
-            ruta_usuario = os.path.join(carpeta_inicio_usuario, "AppData", "Local", "Google", "Chrome", "User Data")
+            binary = None  # Chrome normal en Windows
         else:
             # Para Linux / Raspberry Pi OS
-            ruta_usuario = os.path.join(carpeta_inicio_usuario, ".config", "chromium")
-        options.add_argument(f"--user-data-dir={ruta_usuario}")
+            binary_candidates = ["/usr/bin/chromium-browser", "/usr/bin/chromium"]
+            binary = next((p for p in binary_candidates if Path(p).exists()), None)
+
+        # Chromedriver instalado por apt
+        driver_path_candidates = ["/usr/bin/chromedriver", "/snap/bin/chromedriver"]
+        driver_path = next((p for p in driver_path_candidates if Path(p).exists()), None)
+
+        opts = Options()
+        if binary:
+            opts.binary_location = binary
+
         options.add_argument("--headless=new")  # Usar el nuevo modo headless recomendado
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
@@ -32,7 +43,7 @@ class ChromeService():
 
         # Especifica la ruta al ChromeDriver si no está en el PATH
         # service = Service(executable_path="C:/ruta/a/chromedriver.exe")
-        service = Service()  # Si chromedriver está en el PATH
+        service = Service(executable_path=driver_path)  # Si chromedriver está en el PATH
 
         self.driver = webdriver.Chrome(service=service, options=options)
         self.wait = WebDriverWait(self.driver, 5)
