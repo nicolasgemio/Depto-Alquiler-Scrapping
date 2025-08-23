@@ -3,7 +3,8 @@ pipeline {
 
   // Ejecutar automáticamente cada hora
   triggers {
-    cron('H * * * *')
+    cron('H * * * *')        // cada hora
+    pollSCM('* * * * *')     // chequea cambios en GitHub cada minuto
   }
 
   options {
