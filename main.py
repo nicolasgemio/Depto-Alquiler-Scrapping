@@ -132,9 +132,7 @@ def __main__():
         print(f'[{formato}] Actualización terminada')
 
 if __name__ == "__main__":
-    while True:
-        try:
-            __main__()
-        except Exception as e:
-            print(e)
-        time.sleep(1800)
+    try:
+        __main__()
+    except Exception as e:
+       print(e)
