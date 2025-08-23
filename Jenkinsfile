@@ -1,6 +1,11 @@
 pipeline {
   agent any
 
+  // Ejecutar automáticamente cada hora
+  triggers {
+    cron('H * * * *')
+  }
+
   options {
     timestamps()
     ansiColor('xterm')
@@ -9,15 +14,21 @@ pipeline {
   }
 
   environment {
-    PYTHON   = 'python3'
-    VENV_DIR = '.venv'
+    PYTHON       = 'python3'
+    VENV_DIR     = '.venv'
+    PIP_CACHE    = '.pip-cache'
+    CI           = 'true'
+    JENKINS_RUN  = 'true'
   }
 
   stages {
 
     stage('Checkout') {
       steps {
-        checkout scm
+        checkout([$class: 'GitSCM',
+          branches: [[name: "*/main"]],
+          userRemoteConfigs: [[url: 'https://github.com/nicolasgemio/Depto-Alquiler-Scrapping.git', credentialsId: 'github-token']]
+        ])
         sh 'echo "Archivos en el workspace:" && ls -la'
       }
     }
@@ -31,9 +42,10 @@ pipeline {
           fi
           . "${VENV_DIR}/bin/activate"
           python --version
-          pip install --upgrade pip wheel
+          mkdir -p "${PIP_CACHE}"
+          python -m pip install --upgrade pip wheel
           if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
+            PIP_NO_INPUT=1 python -m pip install --cache-dir "${PIP_CACHE}" -r requirements.txt
           else
             echo "No hay requirements.txt; continuo..."
           fi
@@ -59,33 +71,25 @@ pipeline {
         ]) {
           sh '''
             set -e
-            check_var() {
-              v="$1"
+            for v in BASE_URI MERCADOLIBRE_URL ARGENPROP_URL SMTP_SERVER SMTP_PORT EMAIL_USUARIO DESTINATARIO DB_SERVER DB_NAME DB_USER DB_PASSWORD; do
               if [ -n "$(printenv "$v")" ]; then
                 echo "✅ $v = set"
               else
                 echo "❌ $v = (empty)"
               fi
-            }
-
-            for v in MERCADOLIBRE_URL ARGENPROP_URL BASE_URI SMTP_SERVER SMTP_PORT EMAIL_USUARIO DESTINATARIO DB_SERVER DB_NAME DB_USER DB_PASSWORD; do
-              check_var "$v"
             done
-
-            # Validación crítica (sin arrays, POSIX):
-            missing=""
-            for v in BASE_URI DB_SERVER DB_NAME DB_USER DB_PASSWORD; do
-              if [ -z "$(printenv "$v")" ]; then
-                missing="$missing $v"
-              fi
-            done
-
-            if [ -n "$missing" ]; then
-              echo "FALTAN variables críticas:$missing"
-              exit 1
-            fi
           '''
         }
+      }
+    }
+
+    stage('Limpiar logs/data') {
+      steps {
+        sh '''
+          set -e
+          mkdir -p logs data
+          rm -f logs/*.log
+        '''
       }
     }
 
@@ -108,7 +112,6 @@ pipeline {
           sh '''
             set -e
             . "${VENV_DIR}/bin/activate"
-            mkdir -p logs data
             python main.py > "logs/run_$(date +%F_%H%M%S).log" 2>&1 || true
           '''
         }
