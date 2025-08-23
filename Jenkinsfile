@@ -10,7 +10,19 @@ pipeline {
 
   environment {
     PYTHON = 'python3'
-    VENV_DIR = '.venv'            // entorno virtual local al workspace
+    VENV_DIR = '.venv'
+    MERCADOLIBRE_URL=credentials('MERCADOLIBRE_URL')
+    ARGENPROP_URL=credentials('ARGENPROP_URL')
+    SMTP_SERVER=credentials('SMTP_SERVER')
+    SMTP_PORT=credentials('SMTP_PORT')
+    EMAIL_USUARIO=credentials('EMAIL_USUARIO')
+    EMAIL_PASSWORD=credentials('EMAIL_PASSWORD')
+    DESTINATARIO=credentials('DESTINATARIO')
+    BASE_URI=credentials('BASE_URI')
+    DB_USER=credentials('DB_USER')
+    DB_PASSWORD=credentials('DB_PASSWORD')
+    DB_SERVER=credentials('DB_SERVER')
+    DB_NAME=credentials('DB_NAME')
   }
 
   stages {
