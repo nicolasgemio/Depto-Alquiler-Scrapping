@@ -5,7 +5,6 @@ from services.mail_service import MailService
 from services.depto_scrap_api_service import DeptoScrapAPIService
 from services.mercadolibre_service import MercadolibreService
 from services.argenprop_service import ArgenpropService
-import time
 from dotenv import load_dotenv
 import os
 from datetime import datetime
@@ -13,7 +12,20 @@ from typing import List
 from models.search import Search
 from dtos.department_mail_dto import DepartmentMailDto
 import json
+import logging
 
+os.makedirs("logs", exist_ok=True)
+# Config básica: stdout + archivo
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(),                     # Jenkins lo muestra en consola
+        logging.FileHandler("logs/app.log", "a", "utf-8")  # Guarda histórico
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 firestore_service = None
 chrome_service = None
@@ -129,10 +141,10 @@ def __main__():
 
         ahora = datetime.now()
         formato = ahora.strftime("%Y-%m-%d %H:%M:%S")
-        print(f'[{formato}] Actualización terminada')
+        logger.info(f'Actualización terminada, {len(new_search_departments)} departamentos cargados en la búsqueda {search.search_id}')
 
 if __name__ == "__main__":
     try:
         __main__()
     except Exception as e:
-       print(e)
+       logger.error("Error en la ejecución principal: %s", e)

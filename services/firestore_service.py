@@ -1,7 +1,9 @@
 from models.departamento import DepartmentDto
+import logging
 class FireStoreService():
 
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
         self.db = None
 
     def get_departamentos(self):
@@ -56,7 +58,7 @@ class FireStoreService():
         # Agregar el documento a la colección "deptos"
         nuevo_doc_ref = self.db.collection("deptos").add(departamento_data)
         departamento.id = nuevo_doc_ref[1].id
-        print(f"Departamento agregado con ID: {nuevo_doc_ref[1].id}")
+        self.logger.info(f'Departamento agregado con ID: {nuevo_doc_ref[1].id}')
 
         return departamento
 

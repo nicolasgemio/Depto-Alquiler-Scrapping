@@ -1,9 +1,11 @@
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
+import logging
 
 class MailService():
     def __init__(self, smtp_server, smtp_port, email_usuario, email_password, destinatario='gemionicolas@gmail.com', asunto='Nuevos Departamentos publicados!'): 
+        self.logger = logging.getLogger(__name__)
         self.SMTP_SERVER = smtp_server
         self.SMTP_PORT = smtp_port
         self.EMAIL_USUARIO = email_usuario
@@ -27,7 +29,7 @@ class MailService():
             servidor.sendmail(self.EMAIL_USUARIO, self.DESTINATARIO, msg.as_string())
             servidor.quit()
 
-            print("Correo enviado con éxito.")
+            self.logger.info("Correo enviado con éxito.")
         except Exception as e:
-            print(f"Error al enviar el correo: {e}")
+            self.logger.error(f'Error al enviar el correo: {e}')
 

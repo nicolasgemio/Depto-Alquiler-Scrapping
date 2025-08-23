@@ -7,10 +7,11 @@ from models.participant_reaction import ParticipantReaction
 from models.participant_comment import ParticipantComment
 from sqlalchemy.orm import joinedload
 from database import DEPARTMENT_TABLE
+import logging
 
 class DepartmentRepository:
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     def get_by_search_department_id(self, search_department_id: str) -> SearchDepartmentDto | None:
         with SessionLocal() as db:
@@ -26,7 +27,7 @@ class DepartmentRepository:
                 return search_department_dto
             except Exception as e:
                 db.rollback()
-                print("Error al hacer commit:", e)
+                self.logger.error(f'Error al hacer commit: {e}')
                 raise
 
 
@@ -97,7 +98,7 @@ class DepartmentRepository:
 
             except Exception as e:
                 db.rollback()
-                print("Error al hacer commit:", e)
+                self.logger.error(f'Error al hacer commit: {e}')
                 raise
 
     def remove_department(self, search_department: SearchDepartment, new_reaction: ParticipantReaction) -> ParticipantReaction:
@@ -130,7 +131,7 @@ class DepartmentRepository:
                     return new_reaction
             except Exception as e:
                 db.rollback()
-                print(f"Error al remover el departamento: {e}")
+                self.logger.error(f'Error al remover el departamento: {e}')
                 raise
 
             
@@ -143,5 +144,5 @@ class DepartmentRepository:
                 return new_commentary
             except Exception as e:
                 db.rollback()
-                print(f"Error al comentar el departamento: {e}")
+                self.logger.error(f'Error al comentar el departamento: {e}')
                 raise

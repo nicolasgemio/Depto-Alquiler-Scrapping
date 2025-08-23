@@ -11,9 +11,11 @@ from pathlib import Path
 from datetime import datetime, timezone
 from selenium.webdriver.chrome.service import Service
 from typing import List
+import logging
 
 class ChromeService():
     def __init__(self, ml_url, arg_url):
+        self.logger = logging.getLogger(__name__)
         self.MERCADOLIBRE_URL = ml_url
         self.ARGENPROP_URL = arg_url
 
@@ -82,9 +84,9 @@ class ChromeService():
                     departamentos.append(depto)
 
                 except Exception as e:
-                    print(f"Error procesando un elemento: {e}")
+                    self.logger.error(f'Error procesando un elemento: {e}')
         except e:
-            print('error general de get_ml_departamentos: ', e)
+            self.logger.error(f'error general de get_ml_departamentos: {e}')
         finally:
             self.driver.close()
             self.driver.quit()
@@ -121,10 +123,10 @@ class ChromeService():
                     departamentos.append(depto)
 
                 except Exception as e:
-                    print(f"Error procesando un elemento: {e}")
+                    self.logger.error(f'Error procesando un elemento: {e}')
 
         except Exception as e:
-            print(f"Error procesando un elemento: {e}")
+            self.logger.error(f'Error procesando un elemento: {e}')
         finally:
             self.driver.close()
             self.driver.quit()
