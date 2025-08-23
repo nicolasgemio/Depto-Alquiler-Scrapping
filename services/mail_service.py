@@ -3,13 +3,13 @@ from email.mime.multipart import MIMEMultipart
 import smtplib
 
 class MailService():
-    def __init__(self, smtp_server, smtp_port, email_usuario, email_password): 
+    def __init__(self, smtp_server, smtp_port, email_usuario, email_password, destinatario='gemionicolas@gmail.com', asunto='Nuevos Departamentos publicados!'): 
         self.SMTP_SERVER = smtp_server
         self.SMTP_PORT = smtp_port
         self.EMAIL_USUARIO = email_usuario
         self.EMAIL_PASSWORD = email_password
-        self.DESTINATARIO = 'gemionicolas@gmail.com; floralezano@gmail.com'
-        self.ASUNTO = 'Nuevos Departamentos publicados!'
+        self.DESTINATARIO = destinatario
+        self.ASUNTO = asunto
 
     def send_email(self, mensaje):
         msg = MIMEMultipart()
