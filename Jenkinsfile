@@ -9,20 +9,18 @@ pipeline {
   }
 
   environment {
-    PYTHON = 'python3'
-    VENV_DIR = '.venv'
-    MERCADOLIBRE_URL=credentials('MERCADOLIBRE_URL')
-    ARGENPROP_URL=credentials('ARGENPROP_URL')
-    SMTP_SERVER=credentials('SMTP_SERVER')
-    SMTP_PORT=credentials('SMTP_PORT')
-    EMAIL_USUARIO=credentials('EMAIL_USUARIO')
-    EMAIL_PASSWORD=credentials('EMAIL_PASSWORD')
-    DESTINATARIO=credentials('DESTINATARIO')
-    BASE_URI=credentials('BASE_URI')
-    DB_USER=credentials('DB_USER')
-    DB_PASSWORD=credentials('DB_PASSWORD')
-    DB_SERVER=credentials('DB_SERVER')
-    DB_NAME=credentials('DB_NAME')
+    string(credentialsId: 'BASE_URI',          variable: 'BASE_URI'),
+    string(credentialsId: 'MERCADOLIBRE_URL',  variable: 'MERCADOLIBRE_URL'),
+    string(credentialsId: 'ARGENPROP_URL',     variable: 'ARGENPROP_URL'),
+    string(credentialsId: 'SMTP_SERVER',       variable: 'SMTP_SERVER'),
+    string(credentialsId: 'SMTP_PORT',         variable: 'SMTP_PORT'),
+    string(credentialsId: 'EMAIL_USUARIO',     variable: 'EMAIL_USUARIO'),
+    string(credentialsId: 'EMAIL_PASSWORD',    variable: 'EMAIL_PASSWORD'),
+    string(credentialsId: 'DESTINATARIO',      variable: 'DESTINATARIO'),
+    string(credentialsId: 'DB_SERVER',         variable: 'DB_SERVER'),
+    string(credentialsId: 'DB_NAME',           variable: 'DB_NAME'),
+    string(credentialsId: 'DB_USER',           variable: 'DB_USER'),
+    string(credentialsId: 'DB_PASSWORD',       variable: 'DB_PASSWORD')
   }
 
   stages {
