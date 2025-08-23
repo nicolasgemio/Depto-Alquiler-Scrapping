@@ -37,7 +37,7 @@ def parse_searches_response(searches_raw) -> List[Search]:
 def __main__():
     global firestore_service, chrome_service, mail_service, depto_scrap_api_service, mercadolibre_service, argenprop_service
 
-    load_dotenv()
+    load_dotenv(override=False)
 
     if firestore_service is None:
         firestore_service = FireStoreService()
