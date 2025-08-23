@@ -27,9 +27,9 @@ pipeline {
         sh '''
           set -e
           if [ ! -d "${VENV_DIR}" ]; then
-            ${PYTHON} -m venv ${VENV_DIR}
+            ${PYTHON} -m venv "${VENV_DIR}"
           fi
-          . ${VENV_DIR}/bin/activate
+          . "${VENV_DIR}/bin/activate"
           python --version
           pip install --upgrade pip wheel
           if [ -f requirements.txt ]; then
@@ -59,17 +59,29 @@ pipeline {
         ]) {
           sh '''
             set -e
-            check_var () { v="$1"; val="${!v:-}"; [ -n "$val" ] && echo "✅ $v = set" || echo "❌ $v = (empty)"; }
+            check_var() {
+              v="$1"
+              if [ -n "$(printenv "$v")" ]; then
+                echo "✅ $v = set"
+              else
+                echo "❌ $v = (empty)"
+              fi
+            }
+
             for v in MERCADOLIBRE_URL ARGENPROP_URL BASE_URI SMTP_SERVER SMTP_PORT EMAIL_USUARIO DESTINATARIO DB_SERVER DB_NAME DB_USER DB_PASSWORD; do
               check_var "$v"
             done
 
-            missing=()
+            # Validación crítica (sin arrays, POSIX):
+            missing=""
             for v in BASE_URI DB_SERVER DB_NAME DB_USER DB_PASSWORD; do
-              [ -n "${!v:-}" ] || missing+=("$v")
+              if [ -z "$(printenv "$v")" ]; then
+                missing="$missing $v"
+              fi
             done
-            if [ ${#missing[@]} -gt 0 ]; then
-              echo "FALTAN variables críticas: ${missing[*]}"
+
+            if [ -n "$missing" ]; then
+              echo "FALTAN variables críticas:$missing"
               exit 1
             fi
           '''
@@ -95,9 +107,9 @@ pipeline {
         ]) {
           sh '''
             set -e
-            . ${VENV_DIR}/bin/activate
+            . "${VENV_DIR}/bin/activate"
             mkdir -p logs data
-            python main.py > logs/run_$(date +%F_%H%M%S).log 2>&1 || true
+            python main.py > "logs/run_$(date +%F_%H%M%S).log" 2>&1 || true
           '''
         }
       }
