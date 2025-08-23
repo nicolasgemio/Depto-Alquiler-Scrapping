@@ -83,8 +83,8 @@ class ChromeService():
 
                 except Exception as e:
                     print(f"Error procesando un elemento: {e}")
-        except:
-            print('error general de get_ml_departamentos')
+        except e:
+            print('error general de get_ml_departamentos: ', e)
         finally:
             self.driver.close()
             self.driver.quit()
