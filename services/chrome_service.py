@@ -1,6 +1,7 @@
 from selenium import webdriver
 import os
 import re
+import platform
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,7 +18,11 @@ class ChromeService():
     def start_browser(self):
         options = webdriver.ChromeOptions()
         carpeta_inicio_usuario = os.path.expanduser("~")
-        ruta_usuario = os.path.join(carpeta_inicio_usuario, "AppData", "Local", "Google", "Chrome", "User Data")
+        if platform.system() == "Windows":
+            ruta_usuario = os.path.join(carpeta_inicio_usuario, "AppData", "Local", "Google", "Chrome", "User Data")
+        else:
+            # Para Linux / Raspberry Pi OS
+            ruta_usuario = os.path.join(carpeta_inicio_usuario, ".config", "chromium")
         options.add_argument(f"--user-data-dir={ruta_usuario}")
         options.add_argument("--headless=new")  # Usar el nuevo modo headless recomendado
         options.add_argument("--disable-gpu")
