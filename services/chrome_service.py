@@ -4,8 +4,10 @@ import re
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from firebase_admin import firestore
-from models.departamento import Departamento
+from models.departamento import DepartmentDto
+from datetime import datetime, timezone
+from selenium.webdriver.chrome.service import Service
+from typing import List
 
 class ChromeService():
     def __init__(self, ml_url, arg_url):
@@ -17,16 +19,25 @@ class ChromeService():
         carpeta_inicio_usuario = os.path.expanduser("~")
         ruta_usuario = os.path.join(carpeta_inicio_usuario, "AppData", "Local", "Google", "Chrome", "User Data")
         options.add_argument(f"--user-data-dir={ruta_usuario}")
-        options.add_argument(f"profile-directory=Profile 11")
-        self.driver = webdriver.Chrome(options=options)
+        options.add_argument("--headless=new")  # Usar el nuevo modo headless recomendado
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--start-maximized")
+
+        # Especifica la ruta al ChromeDriver si no está en el PATH
+        # service = Service(executable_path="C:/ruta/a/chromedriver.exe")
+        service = Service()  # Si chromedriver está en el PATH
+
+        self.driver = webdriver.Chrome(service=service, options=options)
         self.wait = WebDriverWait(self.driver, 5)
 
 
-    def get_ml_departamentos(self):
+    def get_ml_departamentos(self, url) -> List[DepartmentDto]:
         try:
             departamentos = []
             # Abre la página de Mercado Libre
-            self.driver.get(self.MERCADOLIBRE_URL)
+            self.driver.get(url)
 
             # Espera algunos segundos para que la página cargue (opcional)
             self.driver.implicitly_wait(10)
@@ -40,16 +51,17 @@ class ChromeService():
                 try:
                     titulo = li.find_element(By.CLASS_NAME, "poly-component__title").text  # Ajusta la clase real
                     precio = li.find_element(By.CLASS_NAME, "andes-money-amount__fraction").text  # Ajusta la clase real
+                    precio_parsed = int(str(precio).replace('.', '').replace(',', ''))
                     direccion = li.find_element(By.CLASS_NAME, "poly-component__location").text  # Ajusta la clase real
 
-                    portada = li.find_element(By.CLASS_NAME, "poly-card__portada")
+                    # portada = li.find_element(By.CLASS_NAME, "poly-card__portada")
 
                     enlace = li.find_element(By.CLASS_NAME, "poly-component__title").get_attribute("href")
 
                     pattern = r"MLA-\d+"  # Busca "MLA-" seguido de uno o más dígitos
                     codigo = re.search(pattern, enlace).group()
 
-                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False, '', '')
+                    depto = DepartmentDto(codigo, titulo, direccion, precio_parsed, enlace, datetime.now(timezone.utc))
 
                     departamentos.append(depto)
 
@@ -62,12 +74,12 @@ class ChromeService():
             self.driver.quit()
             return departamentos
 
-    def get_arg_departamentos(self):
+    def get_arg_departamentos(self, url):
         try:
             departamentos = []
             
             # Abre la página de Argenprop
-            self.driver.get(self.ARGENPROP_URL)
+            self.driver.get(url)
 
             # Espera algunos segundos para que la página cargue (opcional)
             self.driver.implicitly_wait(10)
@@ -81,13 +93,14 @@ class ChromeService():
                 try:
                     titulo = div.find_element(By.CLASS_NAME, "card__title").text  # Ajusta la clase real
                     precio = div.find_element(By.CLASS_NAME, "card__price").text  # Ajusta la clase real
+                    precio_parsed = int(str(precio).replace('.', '').replace(',', '').replace('$', '').split('+')[0].strip())
                     direccion = div.find_element(By.CLASS_NAME, "card__address").text  # Ajusta la clase real
 
                     enlace = div.find_element(By.CLASS_NAME, "card").get_attribute("href")
 
                     id = div.get_attribute("id")
                     codigo = f"ARG-{id}"
-                    depto = Departamento(None, codigo, titulo, direccion, precio, enlace, False, False, firestore.SERVER_TIMESTAMP, False, False, '', '')
+                    depto = DepartmentDto(codigo, titulo, direccion, precio_parsed, enlace, datetime.now(timezone.utc))
 
                     departamentos.append(depto)
 

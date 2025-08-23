@@ -1,20 +1,8 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
-from models.departamento import Departamento
+from models.departamento import DepartmentDto
 class FireStoreService():
 
     def __init__(self):
         self.db = None
-
-    def conect_database(self):
-        # Ruta al archivo JSON de tus credenciales
-        cred = credentials.Certificate('scrapping-deptos-firebase-adminsdk-fbsvc-6339a65ce9.json')
-
-        # Inicializa la app de Firebase con las credenciales
-        firebase_admin.initialize_app(cred)
-
-        # Conéctate a Firestore
-        self.db = firestore.client()
 
     def get_departamentos(self):
         if self.db is None:
@@ -26,7 +14,7 @@ class FireStoreService():
         for d in deptos:
             detpo_id = d.id
             depto_data = d.to_dict()
-            departamento = Departamento(
+            departamento = DepartmentDto(
                 detpo_id,
                 depto_data.get('codigo'),
                 depto_data.get('titulo'),
@@ -67,9 +55,9 @@ class FireStoreService():
 
         # Agregar el documento a la colección "deptos"
         nuevo_doc_ref = self.db.collection("deptos").add(departamento_data)
-
+        departamento.id = nuevo_doc_ref[1].id
         print(f"Departamento agregado con ID: {nuevo_doc_ref[1].id}")
 
-        return nuevo_doc_ref
+        return departamento
 
 

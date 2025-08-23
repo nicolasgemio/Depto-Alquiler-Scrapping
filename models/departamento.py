@@ -1,15 +1,15 @@
-class Departamento():
-    def __init__(self, id, codigo, titulo, direccion, precio, link, rejected_n, rejected_a, creacion, favorito_n, favorito_a, comentario_n, comentario_a):
-        self.id = id
-        self.titulo = titulo
-        self.direccion = direccion
-        self.precio = precio
+import uuid
+
+class DepartmentDto():
+    def __init__(self, codigo, titulo, direccion, precio, link, creacion):
+        self.department_id = uuid.uuid4()
+        self.title = titulo
         self.link = link
-        self.codigo = codigo
-        self.rejected_n = rejected_n
-        self.rejected_a = rejected_a
-        self.creacion = creacion
-        self.favorito_n = favorito_n
-        self.favorito_a = favorito_a
-        self.comentario_n = comentario_n
-        self.comentario_a = comentario_a
+        self.address = direccion
+        self.neighborhood = ""
+        self.photo_url = ""
+        self.price = precio
+        self.price_currency = ""
+        self.publication_date = None
+        self.create_date = creacion
+        self.department_code = codigo
