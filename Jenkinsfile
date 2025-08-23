@@ -113,9 +113,13 @@ pipeline {
           sh '''
             set -e
             . "${VENV_DIR}/bin/activate"
+
+            # === UTF-8 en Jenkins/Linux ===
             export PYTHONUTF8=1
             export LANG=C.UTF-8
             export LC_ALL=C.UTF-8
+            export PYTHONIOENCODING=utf-8
+            
             python main.py > "logs/run_$(date +%F_%H%M%S).log" 2>&1 || true
           '''
         }
