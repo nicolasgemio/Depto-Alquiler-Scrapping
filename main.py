@@ -52,16 +52,17 @@ class App():
             codes_to_add = self.depto_scrap_api_service.get_nonexistent_department_codes(codes)
 
         for d in departments:
-            is_loaded = False
             if d.department_code in codes_to_add:
                 department_id = self.depto_scrap_api_service.create_department(d)
                 d.department_id = department_id
-            else:
-                is_loaded, department_id = self.depto_scrap_api_service.get_if_is_loaded(search_id, d.department_code)
-            
-            if not is_loaded:
-                search_department_id = self.depto_scrap_api_service.create_search_department(search_id, department_id)
-                new_search_departments.append(DepartmentMailDto(d.title, d.department_code, search_department_id))
+ 
+        codes_to_search = [d.department_code for d in departments if d.department_code not in codes_to_add]
+        if len(codes_to_search) > 0:
+            departments_not_loaded = self.depto_scrap_api_service.get_not_loaded(search_id, codes_to_search)
+
+            for d in departments_not_loaded:
+                search_department_id = self.depto_scrap_api_service.create_search_department(search_id, d.department_id)
+                new_search_departments.append(DepartmentMailDto(d.department_code, d.title, search_department_id))
 
         return new_search_departments
 

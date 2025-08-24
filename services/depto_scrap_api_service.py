@@ -40,6 +40,32 @@ class DeptoScrapAPIService():
             self.logger.error(f"Excepción al crear departamento (code={department.department_code}): {ex}")
             raise
     
+    def get_not_loaded(self, search_id, codes: list[str]) -> list[DepartmentDto]:
+        api_url = os.getenv("BASE_URI")
+        url = f"{api_url}/searches/notloaded/search/{search_id}"
+        payload = {"codes": codes}
+        self.logger.info(f"Consultando departamentos no cargados en búsqueda {search_id}: total_codes={len(codes)}")
+        try:
+            response = requests.post(url, json=payload)
+            if response.status_code == 200:
+                departments_data = response.json().get("departments", [])
+                departments = [DepartmentDto(
+                    dept["department_code"],
+                    dept["title"],
+                    dept.get("address", ""),
+                    dept.get("price", 0),
+                    dept.get("link", ""),
+                    datetime.now(timezone.utc)
+                ) for dept in departments_data]
+                self.logger.info(f"Departamentos no cargados encontrados: {len(departments)}")
+                return departments
+            else:
+                self.logger.warning(f"Fallo al consultar departamentos no cargados. search_id={search_id}, status={response.status_code}")
+                raise Exception(f"Error {response.status_code}: {response.text}")
+        except requests.RequestException as ex:
+            self.logger.error(f"Excepción en get_not_loaded: search_id={search_id}, ex={ex}")
+            raise
+        
     def get_if_is_loaded(self, search_id, department_code):
         api_url = os.getenv("BASE_URI")
         url = f"{api_url}/searches/exists/search/{search_id}/department/{department_code}"
