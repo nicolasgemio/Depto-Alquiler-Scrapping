@@ -55,7 +55,8 @@ class DeptoScrapAPIService():
                     dept.get("address", ""),
                     dept.get("price", 0),
                     dept.get("link", ""),
-                    datetime.now(timezone.utc)
+                    datetime.now(timezone.utc),
+                    str(dept["department_id"])
                 ) for dept in departments_data]
                 self.logger.info(f"Departamentos no cargados encontrados: {len(departments)}")
                 return departments

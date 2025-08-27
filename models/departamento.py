@@ -1,8 +1,8 @@
 import uuid
 
 class DepartmentDto():
-    def __init__(self, codigo, titulo, direccion, precio, link, creacion):
-        self.department_id = uuid.uuid4()
+    def __init__(self, codigo, titulo, direccion, precio, link, creacion, id = None):
+        self.department_id = id or uuid.uuid4()
         self.title = titulo
         self.link = link
         self.address = direccion
