@@ -95,7 +95,7 @@ class App():
         self.logger.info(f'Actualización terminada, {len(new_search_departments)} departamentos cargados en la búsqueda {search.search_id}')
 
     def main(self):
-        searches = self.depto_scrap_api_service.get_all_departments()
+        searches = self.depto_scrap_api_service.get_all_searches()
         searches_mapped = self.parse_searches_response(searches)
 
         for search in searches_mapped:

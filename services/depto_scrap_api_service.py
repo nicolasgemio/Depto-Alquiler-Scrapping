@@ -128,29 +128,29 @@ class DeptoScrapAPIService():
             self.logger.error(f"Excepción en get_nonexistent_department_codes: ex={ex}")
             raise    
     
-    def get_all_departments(self):
+    def get_all_searches(self):
         """
-        Realiza una petición GET al endpoint /all para obtener todos los departamentos.
+        Realiza una petición GET al endpoint /all para obtener todas las búsquedas.
 
         Returns:
-            list[dict]: Lista de departamentos obtenidos del endpoint.
+            list[dict]: Lista de búsquedas obtenidos del endpoint.
         Raises:
             Exception: Si la respuesta no es exitosa.
         """
         api_url = os.getenv("BASE_URI")
         url = f"{api_url}/all"
-        self.logger.info(f"Consultando todos los departamentos..." )
+        self.logger.info(f"Consultando todos los búsquedas..." )
         try:
             response = requests.get(url)
             if response.status_code == 200:
-                departamentos = response.json().get("searches", [])
-                self.logger.info(f"Departamentos recibidos: {len(departamentos)}.")
-                return departamentos
+                searches = response.json().get("searches", [])
+                self.logger.info(f"Búsquedas recibidas: {len(searches)}.")
+                return searches
             else:
-                self.logger.warning(f"Fallo al obtener lista de departamentos. Status={response.status_code}")
+                self.logger.warning(f"Fallo al obtener lista de búsquedas. Status={response.status_code}")
                 raise Exception(f"Error {response.status_code}: {response.text}")
         except requests.RequestException as ex:
-            self.logger.error(f"Excepción en get_all_departments: ex={ex}")
+            self.logger.error(f"Excepción en get_all_searches: ex={ex}")
             raise
 
     
